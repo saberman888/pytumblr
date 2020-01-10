@@ -3,6 +3,7 @@ from builtins import str
 from builtins import object
 from .helpers import validate_params, validate_blogname
 from .request import TumblrRequest
+import json
 
 
 class TumblrRestClient(object):
@@ -76,7 +77,19 @@ class TumblrRestClient(object):
 
         :returns: A dict created from the JSON response
         """
-        return self.send_api_request("get", "/v2/user/following", kwargs, ["limit", "offset"])
+        num_blogs = 0
+        rblogs = []
+        url = "/v2/user/following"
+        while True:
+            response = self.send_api_request("get", url, kwargs, ["limit", "offset"])
+            
+            num_blogs += response["total_blogs"]
+            rblogs = rblogs + response["blogs"]
+            if "_links" not in response: break
+            url = response["_links"]["next"]["href"]
+            
+        return (num_blogs,rblogs)
+
 
     def dashboard(self, **kwargs):
         """
