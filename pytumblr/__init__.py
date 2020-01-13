@@ -83,10 +83,11 @@ class TumblrRestClient(object):
         while True:
             response = self.send_api_request("get", url, kwargs, ["limit", "offset"])
             
-            num_blogs += response["total_blogs"]
+            num_blogs = response["total_blogs"]
             rblogs = rblogs + response["blogs"]
             if "_links" not in response: break
             url = response["_links"]["next"]["href"]
+            
             
         return (num_blogs,rblogs)
 
